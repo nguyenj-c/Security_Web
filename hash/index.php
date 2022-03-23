@@ -3,7 +3,7 @@ function RandomString($nb)
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randstring = '';
-    for ($i = 0; $i < $nb; $i++) {
+    for ($i = 0; $i < $nb - 1; $i++) {
         $randstring = $characters[rand(0, strlen($characters))];
     }
     return $randstring;
