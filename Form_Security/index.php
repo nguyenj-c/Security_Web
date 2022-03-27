@@ -43,7 +43,7 @@ input[type=submit]:hover {
 <body>
 
 <h3>Login Form</h3>
- <form class="form-text" action="/Users/login" method="POST">
+ <form class="form-text" action="./login.php" method="POST">
         <label class="form-label" for="email">Email :</label>
         <input type="email" name="email" id="email" size="50" pattern="[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}" placeholder="toto@exemple.com"
                class="input-group-text" required>

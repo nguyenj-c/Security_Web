@@ -7,6 +7,11 @@ final class Users
         'cost' => 10,
     ];
 
+    public function maxID(){
+        $db = new DB();
+        return $db->queryDB("SELECT LAST_INSERT_ID() FROM user ");
+    }
+
     private function addUser($nom, $prenom, $email, $password)
     {
         $db = new DB();
