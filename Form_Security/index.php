@@ -1,8 +1,5 @@
-<?php
-
-echo '
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -39,6 +36,7 @@ input[type=submit]:hover {
   padding: 20px;
 }
 </style>
+    <title>Login</title>
 </head>
 <body>
 
@@ -50,10 +48,11 @@ input[type=submit]:hover {
         <label class="form-label" for="mdp">Mot de passe :</label>
         <input type="password" name="mdp" id="mdp" class="input-group-text">
         <input type="submit" name="submit" value="Envoyer" class="btn btn-lg btn-primary btn-block">
+        <a href="registerForm.php">Vous n'êtes pas inscrit ?</a>
  </form>
 </body>
 </html>
-';
+<?php
 session_start();
 
 print_r($_SERVER);
