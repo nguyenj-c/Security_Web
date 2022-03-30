@@ -53,8 +53,6 @@ input[type=submit]:hover {
 </body>
 </html>
 <?php
-session_start();
 
-print_r($_SERVER);
 
 

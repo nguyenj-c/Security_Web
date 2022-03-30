@@ -1,0 +1,11 @@
+<IfModule !mod_rewrite.c>
+   ErrorDocument 500 "mod_rewrite doit etre installé et activé"
+</IfModule>
+RewriteEngine On
+# Tout ce qui n'est ni un fichier...
+RewriteCond %{REQUEST_FILENAME} !-f
+# Ni un répertoire...
+RewriteCond %{REQUEST_FILENAME} !-d
+# Sera redirigé sur le fichier index.php sous le nom d'url !
+
+RewriteRule ^([a-zA-Z0-9\-\_\/]*)$ index.php?url=$1

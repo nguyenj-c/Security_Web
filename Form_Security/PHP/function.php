@@ -1,20 +1,12 @@
 <?php
 
-function addUser($nom, $prenom, $phone,$email, $address)
-{
-    $db = new PDO('mysql:host=localhost;dbname=security_web; charset=utf8', 'root', '');
-    return $db->query("INSERT INTO user_details (lastname,firstname,phone,email,address,createdAt) 
-                               VALUES ('$nom','$prenom','$phone','$email','$address',NOW())");
-}
-
-function exist() : bool
+function exist($username)
 {
     $not_exist = false;
 
-    $db = new PDO('mysql:host=localhost;dbname=security_web; charset=utf8', 'root', '');
-    $username = $_POST['username'];
+    $db = mysqli_connect('localhost', 'root', '','security_web');
 
-    $infoUser = $db->query("SELECT * FROM user WHERE username='$username'");
+    $infoUser = mysqli_query($db,"SELECT * FROM user WHERE username='$username'");
 
     if ( isset($infoUser) && $infoUser->username !== $username ) {
         $not_exist = true;
@@ -24,44 +16,61 @@ function exist() : bool
 
 function registerUser()
 {
-    $bool = exist();
-    if (!$bool) {
-        return header('location: ./error.php');
-    }
-    $nom = $_POST['lastname'];
-    $prenom = $_POST['firstname'];
+    $lastname = $_POST['lastname'];
+    $firstname = $_POST['firstname'];
     $email = $_POST['email'];
+    $phone= $_POST['phone'];
+    $address= $_POST['Address'];
+    $username = $_POST['username'];
     $password = password_hash($_POST['mdp'], PASSWORD_BCRYPT, ['cost' => 10]);
-    addUser($nom, $prenom, $email, $password);
-    return header('location: ./index.php');
+    $bool = exist($username);
+    if (!$bool) {
+        return header('location: error.php');
+    }
+    $db = mysqli_connect('localhost', 'root', '','security_web');
+    $dbEncrypt = mysqli_connect('localhost', 'root', '','security_web_encrypt');
+    mysqli_query($db,"INSERT INTO user (username,password,createAt)
+                               VALUES ('$username','$password',NOW())");
+    mysqli_query($db,"INSERT INTO user_details (user_id,lastname,firstname,phone,email,address,createdAt)
+                               VALUES (LAST_INSERT_ID(),'$lastname','$firstname','$phone','$email','$address',NOW())");
+
+    $key = openssl_random_pseudo_bytes(256/4);
+
+    $ivlen = openssl_cipher_iv_length('AES128');
+    $iv = openssl_random_pseudo_bytes($ivlen);
+
+    mysqli_query($dbEncrypt,"INSERT INTO encrypt (user_id,key,iv)
+                               VALUES (LAST_INSERT_ID(),'$key','$iv')");
+    return header('location: index.php');
 }
 
-function resetTentatives($db, $resultRequest, $email) : bool
+function resetTentatives($db, $resultRequest)
 {
+    session_start();
     $bloquer =$resultRequest->bloquer;
-    $current_connexion = $resultRequest->current_connexion;
+    $user = $_SESSION['user_id'];
     if($bloquer == 1){
         return false;
     }
-    $db->query("UPDATE user SET nb_connexion = '$resultRequest->nb_connexion' + 1, tentatives = 0 WHERE email = '$email';");
-    $db->query("UPDATE user SET last_connexion = '$current_connexion', current_connexion = NOW() WHERE email = '$email';");
+    mysqli_query($db,"UPDATE user SET try = 0 WHERE user_id = '$user'");
+
     return true;
 }
 
-function increaseTentative($db, $resultRequest, $email) : bool
+function increaseTentative($db, $resultRequest, $email)
 {
     $tentatives = $resultRequest->tentatives;
-    $db->query("UPDATE user SET tentatives = '$tentatives' + 1 WHERE email = '$email';");
+    mysqli_query($db,"UPDATE user SET tentatives = '$tentatives' + 1 WHERE email = '$email'");
     if($tentatives >= 2){
-        $db->query("UPDATE user SET bloquer = 1 WHERE email = '$email';");
+        $db->query("UPDATE user SET bloquer = 1 WHERE email = '$email'");
     }
     return false;
 }
 
 function verifierTentatives($email,$emailDB, $password) : bool
 {
-    $db = new PDO('mysql:host=localhost;dbname=security_web; charset=utf8', 'root', '');
-    $result_db = $db->query("SELECT * FROM user WHERE email='$email'");
+    $db = mysqli_connect('localhost', 'root', '','security_web');
+    $result_db = mysqli_query($db,"SELECT * FROM user WHERE email='$email'");
     $resultRequest = $result_db->fetch();
 
     return match (TRUE) {
@@ -71,13 +80,13 @@ function verifierTentatives($email,$emailDB, $password) : bool
     };
 }
 
-public function connect()
+function connect()
 {
     session_start();
     $email = $_POST['email'];
-    $db = new PDO('mysql:host=localhost;dbname=security_web; charset=utf8', 'root', '');
-    $request = $db->queryDB("SELECT * FROM user WHERE email='$email'");
-    $requestToken = $db->queryDB("SELECT * FROM token WHERE email_user='$email'");
+    $db = mysqli_connect('localhost', 'root', '','security_web');
+    $request = $db->query("SELECT * FROM user WHERE email='$email'");
+    $requestToken = $db->query("SELECT * FROM token WHERE email_user='$email'");
 
     $resultToken = $requestToken->fetch();
     $resultRequest = $request->fetch();

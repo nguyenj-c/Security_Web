@@ -1,0 +1,392 @@
+$font-stack:    Helvetica, sans-serif;
+$background: white;
+
+
+@import "bootstrap";
+
+@mixin bordered($color,$theme) {
+  background: $theme;
+  border-radius: 10px;
+}
+@mixin centered() {
+  margin-left: auto;
+  margin-right: auto;
+}
+@mixin headerNav($width){
+  width: $width;
+  margin-bottom: 30px;
+  nav {
+    a {
+      display: block;
+      padding: 6px 12px;
+      text: {
+        decoration: none;
+        align: center;
+      }
+    }
+  }
+  h1{
+    text-align: center;
+    margin: 10px;
+  }
+}
+
+div#signinButton, .fb-login-button, .fb_iframe_widget {
+  width: auto;
+  margin: 10px auto;
+}
+div#signinButton {
+  width: 8%;
+  margin-top: 30px;
+}
+#post-button{
+  text-align: center;
+  font-size: 20px;
+}
+hr {
+  height: 8px;
+  color: black;
+  padding: 2px;
+  content: "Or";
+  overflow: visible;
+  text-align: center;
+  height: 5px;
+}
+
+hr:after {
+  background: #fff;
+  content: 'Ou';
+  padding: 0 4px;
+  position: relative;
+  top: -13px;
+  font-size: 20px;
+}
+@mixin important-text($type) {
+  font-size: 25px;
+  margin: auto;
+  @if $type == lien {
+    color: $blue;
+  } @else if $type == titre {
+    color: $blue;
+  } @else if $type == souligne {
+    text-decoration: underline;
+  } @else if $type == gras {
+    font-weight: bold;
+  } @else if $type == label {
+    font-weight: bold;
+    padding: 15px 0px 15px 0px;
+  } @else {
+    @error "Unknown type #{$type}.";
+  }
+}
+body {
+  font: 100% $font-stack;
+  color: $black;
+  background: $background;
+}
+.tete {
+  @include headerNav(100%);
+}
+.pagination{
+  justify-content: center;
+}
+
+h2#nomCategory {
+  text-align: center;
+}
+h3#docTitle {
+  margin-left: 20%;
+}
+p#bodyDoc {
+  margin-left: 25%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 50%;
+}
+button.add-button {
+  color: red;
+  background: black;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+@mixin alertes() {
+  border-top: 1px solid Red;
+  padding: 10px;
+  color: red;
+}
+main{
+  ul{
+    list-style: none;
+    li{
+      border: 1px solid grey;
+      width: 75%;
+      justify-content: center;
+      @include centered();
+    }
+  }
+}
+p#capteurData1 ,p#capteurData2{
+  position: relative;
+  top: -5em;
+  padding: 0px 20%;
+  text-align: center;
+  font-size: 50px;
+  color: white;
+}
+#capteur{
+  display: flex;
+  justify-content: space-evenly;
+  article {
+    display: inline-block;
+    margin-left: 60px;
+    margin-right: 60px;
+  }
+  h2{
+    text-align: center;
+  }
+  img{
+    display: block;
+    @include centered;
+    width: 430px;
+  }
+}
+
+.input-group-text{
+  width: 100%;
+}
+.modal{
+  display: block;
+  margin-top: 3%;
+}
+.modal2{
+  display: block;
+  margin-top: 3%;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 14px;
+  font-size: 60px;
+  transform: rotate(45deg);
+  cursor: pointer;
+  color: black;
+}
+.modal-content {
+  width: 95%;
+  height: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+#titre-popup {
+  @include centered();
+  font-size: 50px;
+}
+p#informations-alertes {
+  text-align: center;
+  font-size: 28px;
+  margin-top: 40px;
+}
+a#lienHistory {
+  color: cyan;
+  font-size: 35px;
+  float: right;
+  margin-right: 5%;
+  margin-top: 60px;
+}
+#titre-capteur{
+  font-size: 40px;
+  margin-left: 20px;
+  margin-bottom: 5%;
+}
+form{
+  display: grid;
+  width: 45%;
+  @include bordered(black, white);
+  padding: 10px 10px 10px 10px;
+  margin: 0px auto 50px;
+  input[type=submit]{
+    margin-top: 20px;
+    @include bordered(white, $blue);
+  }
+  a{
+    margin-top: 10px;
+  }
+}
+
+#historique {
+  summary {
+    @include alertes();
+  }
+  p{
+    margin-top: 15px;
+  }
+}
+
+label{
+  @include important-text(label);
+}
+
+footer{
+    background-color: black;
+    text-align: center;
+    color: white;
+    padding: 5px;
+}
+
+p#resultRequest {
+  text-align: center;
+}
+
+@media screen and (max-width: 1050px){
+  #capteur {
+    display: grid;
+    img {
+      width: 350px;
+    }
+    article {
+      display: inline-block;
+    }
+  }
+  p,li{
+    font-size: 20px;
+  }
+  p#capteurData1 ,p#capteurData2{
+    padding: 0px 14%;
+    top: -5em;
+  }
+  .modal, .modal2{
+    margin-top: 4%;
+  }
+}
+@media screen and (max-width: 800px){
+  form{
+    width: 80%;
+    font-size: 35px;
+  }
+  label{
+    font-size: 35px;
+    margin: 5px auto 15px;
+  }
+  .tete{
+    nav{
+      a{
+        font-size: 35px;
+      }
+    }
+  }
+  header{
+    h1{
+      display: none;
+    }
+  }
+  #capteur {
+    display: inline-block;
+    margin: 0px 0% 5px;
+    img {
+      width: 300px;
+    }
+    article {
+      display: inline-block;
+      margin-right: 0px;
+      margin-left: 35px;
+    }
+  }
+  p,li{
+    font-size: 20px;
+  }
+  p#capteurData1 ,p#capteurData2{
+    padding: 0px 16%;
+    top: -4em;
+  }
+  #titre-capteur{
+    display: none;
+  }
+  #titre-popup {
+    font-size: 45px;
+  }
+  .modal, .modal2{
+    margin-top: 3%;
+  }
+}
+@media screen and (max-width: 600px) {
+  form{
+    width: 85%;
+  }
+  header {
+    h1 {
+      display: none;
+    }
+  }
+  #capteur {
+    display: contents;
+    margin: 0px 25% 5px;
+    img {
+      width: 270px;
+    }
+    article {
+      margin-left: 70px;
+    }
+  }
+  .tete {
+    width: 100%;
+
+    nav {
+      a {
+        font-size: 25px;
+      }
+    }
+  }
+  p#capteurData1 ,p#capteurData2{
+    padding: 0px 18%;
+    top: -4em;
+  }
+  .modal, .modal2{
+    margin-top: 8%;
+  }
+  #informations-alertes, a#lienHistory {
+    font-size: 20px;
+    margin-top: 15px;
+  }
+}
+@media screen and (max-width: 400px) {
+  form{
+    width: 85%;
+  }
+  header {
+    h1 {
+      display: none;
+    }
+  }
+  #capteur {
+    margin: 0px 20% 5px;
+    img {
+      width: 300px;
+    }
+    article {
+      margin-left: 0px;
+    }
+  }
+  .tete {
+    width: 100%;
+
+    nav {
+      a {
+        font-size: 25px;
+      }
+    }
+  }
+  p#capteurData1 ,p#capteurData2{
+    padding: 0px 20%;
+    top: -4em;
+  }
+  .modal, .modal2{
+    margin-top: 8%;
+  }
+}
+.doclist{
+  h2{
+    text-align: center;
+  }
+}
