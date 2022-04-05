@@ -31,7 +31,7 @@ final class Users
         $email = htmlentities($_POST['email']);
         $phone= htmlentities($_POST['phone']);
         $address= htmlentities($_POST['Address']);
-        $username = password_hash($_POST['username'],PASSWORD_BCRYPT, $this->options);;
+        $username =  hash('sha512', $_POST['username']);
         $password = password_hash($_POST['mdp'], PASSWORD_BCRYPT, $this->options);
 
         $bool = $this->exist($username);
@@ -57,50 +57,49 @@ final class Users
         $db->execDB("INSERT INTO ip_address (user_id,user_agent,ip)
                                VALUES ('$user_id','$user_agent','$ip')");
 
-        $key = openssl_random_pseudo_bytes(256/4);
+        $keyGenerate = openssl_random_pseudo_bytes(256/4);
 
         $ivlen = openssl_cipher_iv_length('AES128');
-        $iv = openssl_random_pseudo_bytes($ivlen);
+        $iv = bin2hex(openssl_random_pseudo_bytes($ivlen));
 
-        $keyHash = htmlentities(bin2hex($key));
+        $keyHash = htmlentities(bin2hex($keyGenerate));
 
-        $dbEncrypt->execDB("INSERT INTO encrypt (user_id,key,iv)
-                               VALUES ('$user_id','$keyHash','$iv')");
+        $dbEncrypt->execDB("INSERT INTO encrypt (user_id,iv,cle)
+                               VALUES ('$user_id','$iv','$keyHash')");
 
         return header('location: ../Pages/login');
     }
 
-    private function resetTentatives($db, $resultRequest, $email) : bool
+    private function resetTentatives($db, $username) : bool
     {
-        $bloquer =$resultRequest->I;
-        $current_connexion = $resultRequest->current_connexion;
-        if($bloquer == 1){
+        $request = $db->queryDB("SELECT user.user_id FROM user,ip_address WHERE username='$username' AND user.user_id = ip_address.user_id AND ip_address.ip NOT IN (SELECT ip FROM blacklist)");
+
+        if($request != true){
             return false;
         }
-        $db->queryDB("UPDATE user SET nb_connexion = '$resultRequest->nb_connexion' + 1, tentatives = 0 WHERE email = '$email';");
-        $db->queryDB("UPDATE user SET last_connexion = '$current_connexion', current_connexion = NOW() WHERE email = '$email';");
+        $db->queryDB("UPDATE ip_address SET try = 0 WHERE user_id = ( SELECT user_id FROM user WHERE username='$username')");
         return true;
     }
 
-    private function increaseTentative($db, $resultRequest, $email) : bool
+    private function increaseTentative($db, $resultRequest, $username) : bool
     {
-        $tentatives = $resultRequest->tentatives;
-        $db->queryDB("UPDATE user SET tentatives = '$tentatives' + 1 WHERE email = '$email';");
-        if($tentatives >= 2){
-            $db->queryDB("UPDATE user SET bloquer = 1 WHERE email = '$email';");
+        $try = $resultRequest->try;
+        $ip = $resultRequest->ip;
+
+        $db->queryDB("UPDATE ip_address SET try = '$try' + 1 WHERE user_id = ( SELECT user_id FROM user WHERE username='$username')");
+        if($try >= 2){
+            $db->queryDB("INSERT INTO blacklist (ip) VALUES ('$ip')");
         }
         return false;
     }
 
-    private function verifierTentatives($email,$emailDB, $password) : bool
+    private function verifierTentatives($username, $request, $password) : bool
     {
         $db = new DB();
-        $result_db = $db->queryDB("SELECT * FROM user WHERE email='$email'");
-        $resultRequest = $result_db->fetch();
 
         return match (TRUE) {
-            ( $email == $emailDB && $password == true ) => $this->resetTentatives($db,$resultRequest,$email),
-            ($email == $emailDB && $password != true) => $this->increaseTentative($db,$resultRequest,$email),
+            ( $username == $request->username && $password == true ) => $this->resetTentatives($db,$request,$username),
+            ($username == $request->username && $password != true ) => $this->increaseTentative($db,$request,$username),
             default => false,
         };
     }
@@ -108,31 +107,29 @@ final class Users
     public function connect()
     {
         session_start();
-        $username = htmlentities($_POST['username']);
         $db = new DB();
-        $request = $db->queryDB("SELECT * FROM user WHERE email='$username'");
-        $requestToken = $db->queryDB("SELECT * FROM token WHERE email_user='$email'");
 
-        $resultRequest = $request->fetch();
+        $username =  hash('sha512', $_POST['username']);
 
-        $mdp = $resultRequest->password;
-        $emailDB = $resultRequest->email;
+        $request = $db->queryDB("SELECT * FROM user WHERE username='$username'");
+
+        $mdp = $request->password;
 
         $password = password_verify($_POST['mdp'], $mdp);
 
-        if (!$this->verifierTentatives($email, $emailDB, $password)) {
+        if (!$this->verifierTentatives($username,$request, $password)) {
             $_SESSION['tentatives'] += 1;
-            $requestUpdate = $db->queryDB("SELECT * FROM user WHERE email='$email'");
-            $resultUpdate = $requestUpdate->fetch();
-            $bloquer = $resultUpdate->bloquer;
+            $request = $db->queryDB("SELECT user_id FROM user,ip_address WHERE username='$username' 
+                                      AND user.user_id = ip_address.user_id AND ip NOT IN (
+                                                SELECT ip FROM blacklist
+                                          )");
 
-            if($bloquer != 1){
+            if($request != true){
                 return header('Location: /Pages/login');
             }
             return header('Location: /Users/bloquer');
         }
-        $_SESSION['log'] = $resultRequest->role;
-        $_SESSION['email'] = $email;
+
         return header('Location: /Pages/home');
     }
 

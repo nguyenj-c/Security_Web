@@ -3,7 +3,7 @@
     echo '
         <h3>Login Form</h3>
   <form class="form-text" action="/Users/login" method="POST">
-        <label class="form-label" for="username">Email :</label>
+        <label class="form-label" for="username">Username :</label>
         <input type="text" name="username" id="username" size="10" placeholder="toto"
                class="input-group-text" required>
         <label class="form-label" for="mdp">Mot de passe :</label>

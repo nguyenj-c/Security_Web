@@ -45,7 +45,7 @@ final class dbEncrypt extends PDO
             die('Erreur : ' . $e->getMessage());
         }
     }
-    public function prepareAndExecDB($str,$array) : void
+    public function prepareAndExecDB($str,$array)
     {
         try{
             $dsn = 'mysql:host='. self::DBHOST . ';dbname=' . self::DBNAME;
@@ -54,7 +54,7 @@ final class dbEncrypt extends PDO
             $pdo->exec('SET CHARACTER SET utf8');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $q = $pdo->prepare($str);
-            $q->execute($array);
+            return $q->execute($array);
 
         }catch(PDOException $e){
             die('Erreur : ' . $e->getMessage());
