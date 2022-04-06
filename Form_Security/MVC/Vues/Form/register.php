@@ -1,5 +1,5 @@
 <h3>Register Form</h3>
-<form class="form-text" action="../Users/register" method="POST" onsubmit="return Validate(this)">
+<form class="form-text" action="../Users/register" method="POST" onsubmit="return Validate(this)" enctype="multipart/form-data">
     <label class="form-label" for="email">Email :</label>
     <input type="email" name="email" id="email" size="50" pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}" placeholder="toto@exemple.com"
            class="input-group-text" required>
@@ -17,5 +17,9 @@
     <input type="password" name="mdp" id="mdp" class="input-group-text" required>
     <label class="form-label" for="mdp2">Confirmation mot de passe :</label>
     <input type="password" name="mdp2" id="mdp2" class="input-group-text"  required>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Image de profil <i><font size="-3" >(optionnel)</font></i></label>
+        <input type="file" class="form-control" name="avatar">
+    </div>
     <input type="submit" name="submit" value="Envoyer" class="btn btn-lg btn-primary btn-block">
 </form>

@@ -26,6 +26,7 @@ final class Users
     public function registerUser()
     {
 
+        $db = new DB();
         $lastname = htmlentities($_POST['lastname']);
         $firstname = htmlentities($_POST['firstname']);
         $email = htmlentities($_POST['email']);
@@ -33,6 +34,7 @@ final class Users
         $address= htmlentities($_POST['Address']);
         $username =  hash('sha512', $_POST['username']);
         $password = password_hash($_POST['mdp'], PASSWORD_BCRYPT, $this->options);
+
 
         $bool = $this->exist($username);
         if (!$bool) {
